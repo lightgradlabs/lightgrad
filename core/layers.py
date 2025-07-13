@@ -1,8 +1,8 @@
-# core/layers.py — using autograd + matmul engine
+# core/layers.py
 
 import random
 from core.autograd import Tensor
-from core.matmul import matmul
+from core.matmul import matmul, transpose
 
 class Linear:
     def __init__(self, in_features, out_features):
@@ -14,9 +14,14 @@ class Linear:
         self.bias = Tensor([[0.0 for _ in range(out_features)]], requires_grad=True)
 
     def __call__(self, x: Tensor):
-        return matmul(x, transpose(self.weight)) + self.bias
+        z = matmul(x, transpose(self.weight))
+        # Bias broadcasting
+        out_data = [
+            [z.data[i][j] + self.bias.data[0][j] for j in range(len(z.data[0]))]
+            for i in range(len(z.data))
+        ]
+        out = Tensor(out_data, requires_grad=True)
+        out._prev = {x, self.weight, self.bias}
+        return out
 
-def transpose(t: Tensor):
-    t_data = list(zip(*t.data))
-    return Tensor([list(row) for row in t_data], requires_grad=t.requires_grad)
 

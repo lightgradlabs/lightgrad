@@ -1,8 +1,8 @@
-# LightGrad: Minimal Autograd Engine (Fixed Broadcasting Add)
+# LightGrad: Minimal Autograd Engine with Broadcasting Add
 
 class Tensor:
     def __init__(self, data, requires_grad=False):
-        self.data = data  # 2D list: e.g., [[1, 2], [3, 4]]
+        self.data = data
         self.requires_grad = requires_grad
         self.grad = None
         self._backward = lambda: None
@@ -41,4 +41,3 @@ class Tensor:
 
     def backward(self):
         self._backward()
-

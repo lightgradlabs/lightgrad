@@ -1,8 +1,8 @@
-# core/autograd.py — LightGrad autograd engine (final fixed)
+# core/autograd.py — LightGrad Tensor (Demo Gradient Tracker)
 
 class Tensor:
     def __init__(self, data, requires_grad=False):
-        self.data = data
+        self.data = data  # 2D list
         self.requires_grad = requires_grad
         self.grad = None
         self._backward = lambda: None
@@ -27,7 +27,6 @@ class Tensor:
         return out
 
     def backward(self):
-        # Topological sort (simple)
         visited = set()
         topo = []
 
@@ -40,7 +39,8 @@ class Tensor:
 
         build_topo(self)
 
-        self.grad = [[1.0 for _ in row] for row in self.data]
+        self.grad = [[1.0 for _ in row] for row in self.data]  # dL/dL = 1
 
         for t in reversed(topo):
             t._backward()
+

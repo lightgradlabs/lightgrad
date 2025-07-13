@@ -1,4 +1,4 @@
-# LightGrad: Minimal Autograd Engine
+# LightGrad: True Autograd Engine (v2)
 
 class Tensor:
     def __init__(self, data, requires_grad=False):
@@ -26,7 +26,22 @@ class Tensor:
         return out
 
     def backward(self):
-        self._backward()
+        visited = set()
+        topo_order = []
+
+        def build_graph(t):
+            if t not in visited:
+                visited.add(t)
+                for child in t._prev:
+                    build_graph(child)
+                topo_order.append(t)
+
+        build_graph(self)
+
+        self.grad = [[1 for _ in row] for row in self.data]  # dL/dL = 1
+        for node in reversed(topo_order):
+            node._backward()
+
 
 # Example
 if __name__ == "__main__":

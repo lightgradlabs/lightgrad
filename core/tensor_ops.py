@@ -1,7 +1,12 @@
-# LightGrad: Minimal Tensor Ops (CPU-based)
+# tensor_ops.py — Reusable math ops for LightGrad
+
+def add(a, b):
+    return [[a[i][j] + b[i][j] for j in range(len(a[0]))] for i in range(len(a))]
+
+def mul(a, b):
+    return [[a[i][j] * b[i][j] for j in range(len(a[0]))] for i in range(len(a))]
 
 def matmul(a, b):
-    # Basic matrix multiplication without NumPy
     result = [[0 for _ in range(len(b[0]))] for _ in range(len(a))]
     for i in range(len(a)):
         for j in range(len(b[0])):
@@ -9,9 +14,5 @@ def matmul(a, b):
                 result[i][j] += a[i][k] * b[k][j]
     return result
 
-# Example usage (temporary test)
-if __name__ == "__main__":
-    A = [[1, 2], [3, 4]]
-    B = [[5, 6], [7, 8]]
-    print("Result of matmul:")
-    print(matmul(A, B))
+def relu(x):
+    return [[max(0, val) for val in row] for row in x]

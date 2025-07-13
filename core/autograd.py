@@ -1,32 +1,31 @@
-# LightGrad: Minimal Autograd Engine (Updated with Broadcasting)
+# LightGrad: Minimal Autograd Engine (Fixed Broadcasting Add)
 
 class Tensor:
     def __init__(self, data, requires_grad=False):
-        self.data = data
+        self.data = data  # 2D list: e.g., [[1, 2], [3, 4]]
         self.requires_grad = requires_grad
         self.grad = None
         self._backward = lambda: None
         self._prev = set()
 
+    def shape(self):
+        return len(self.data), len(self.data[0]) if self.data else 0
+
     def __add__(self, other):
         if not isinstance(other, Tensor):
-            other = Tensor(
-                [[other for _ in self.data[0]] for _ in self.data],
-                requires_grad=False
-            )
+            raise TypeError("Only Tensor addition supported.")
 
-        # Broadcasting-safe addition
-        out_rows = max(len(self.data), len(other.data))
-        out_cols = max(len(self.data[0]), len(other.data[0]))
+        a_rows, a_cols = self.shape()
+        b_rows, b_cols = other.shape()
 
-        def get_val(tensor, i, j):
-            row = tensor.data[i % len(tensor.data)]
-            return row[j % len(row)]
-
-        out_data = [
-            [get_val(self, i, j) + get_val(other, i, j) for j in range(out_cols)]
-            for i in range(out_rows)
-        ]
+        out_data = []
+        for i in range(max(a_rows, b_rows)):
+            row = []
+            for j in range(max(a_cols, b_cols)):
+                a_val = self.data[i % a_rows][j % a_cols]
+                b_val = other.data[i % b_rows][j % b_cols]
+                row.append(a_val + b_val)
+            out_data.append(row)
 
         out = Tensor(out_data, requires_grad=self.requires_grad or other.requires_grad)
 
@@ -42,3 +41,4 @@ class Tensor:
 
     def backward(self):
         self._backward()
+

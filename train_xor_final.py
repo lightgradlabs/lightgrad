@@ -38,7 +38,17 @@ for epoch in range(50):
     pred = z2
 
     loss = mse_loss(pred, y)
-    loss.backward()
+    loss.backward()                                                                                       
+    # Safe fallback in case gradients aren't set
+if l2.weight.grad is None:
+    l2.weight.grad = [[0 for _ in row] for row in l2.weight.data]
+if l2.bias.grad is None:
+    l2.bias.grad = [[0 for _ in row] for row in l2.bias.data]
+if l1.weight.grad is None:
+    l1.weight.grad = [[0 for _ in row] for row in l1.weight.data]
+if l1.bias.grad is None:
+    l1.bias.grad = [[0 for _ in row] for row in l1.bias.data]
+
 
     # Gradient descent
     for i in range(len(l2.weight.data)):

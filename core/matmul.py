@@ -1,28 +1,19 @@
-# matmul.py — matrix multiplication with gradients
+# core/matmul.py
 
 from core.autograd import Tensor
 
-def matmul(a: Tensor, b: Tensor) -> Tensor:
-    out_data = []
+def matmul(a, b):
+    result = []
     for i in range(len(a.data)):
         row = []
-        for j in range(len(b.data[0])):
-            val = sum(a.data[i][k] * b.data[k][j] for k in range(len(b.data)))
+        for j in range(len(b[0])):
+            val = sum(a.data[i][k] * b[k][j] for k in range(len(b)))
             row.append(val)
-        out_data.append(row)
+        result.append(row)
+    return Tensor(result, requires_grad=a.requires_grad or b.requires_grad)
 
-    out = Tensor(out_data, requires_grad=a.requires_grad or b.requires_grad)
-
-    def _backward():
-        if a.requires_grad:
-            a.grad = [[1 for _ in row] for row in a.data]
-        if b.requires_grad:
-            b.grad = [[1 for _ in row] for row in b.data]
-    out._backward = _backward
-    out._prev = {a, b}
-    return out
-
-def transpose(t: Tensor) -> Tensor:
-    transposed = list(map(list, zip(*t.data)))
-    return Tensor(transposed, requires_grad=t.requires_grad)
+def transpose(tensor):
+    transposed = [[tensor.data[j][i] for j in range(len(tensor.data))]
+                  for i in range(len(tensor.data[0]))]
+    return Tensor(transposed, requires_grad=tensor.requires_grad)
 

@@ -38,9 +38,6 @@ class Tensor:
         self_rows, self_cols = len(self.data), len(self.data[0])
         other_rows, other_cols = len(other.data), len(other.data[0])
         
-        # Debug print to see what shapes we're working with
-        print(f"DEBUG: Adding tensors [{self_rows}x{self_cols}] + [{other_rows}x{other_cols}]")
-        
         # Broadcasting logic
         if self_rows == other_rows and self_cols == other_cols:
             # Same shape - direct addition
